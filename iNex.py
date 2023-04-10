@@ -1,7 +1,6 @@
 import os
 import random
-import tkinter
-from tkinter import messagebox, simpledialog, Button, Label, ttk
+from tkinter import messagebox, simpledialog, Label, ttk
 from tkinter import *
 import turtle
 import time
@@ -195,23 +194,26 @@ def happy_birthday():
 
     
 #Tables
-# Initialize text-to-speech engine
-
-
 def multiply_questions():
-    windows = Tk()
     while True:
+
         num1 = random.randint(1, 20)
         num2 = random.randint(1, 20)
+
         if (num1 >= 11 and num2 >= 11) or (num1 < 11 and num2 < 11):
             continue
+
         question = f"What is {num1} x {num2}?"
         answer = num1 * num2
+
         nex.say(question)
         nex.runAndWait()
+
         user_answer = input(f"Answer to {question}: ")
+
         if user_answer.lower() == "exit":
             break
+
         elif int(user_answer) == answer:
             nex.say("Correct!")
             nex.runAndWait()
@@ -221,10 +223,13 @@ def multiply_questions():
 
 
 def create_window():
+
     windows = Tk()
     windows.title("Multiplication Quiz")
     windows.geometry("300x200")
+
     # Create label and buttons
+
     label = ttk.Label(windows, text="Select an option:")
     label.pack(pady=10)
     
@@ -240,6 +245,7 @@ def tables():
     nex.say('I will ask you random questions, try to answer them')
     nex.runAndWait()
     create_window()
+
 
 
 #About
