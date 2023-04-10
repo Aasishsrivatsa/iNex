@@ -1,8 +1,8 @@
 import os
 import random
+import tkinter
+from tkinter import messagebox, simpledialog, Button, Label, ttk
 from tkinter import *
-from tkinter import messagebox, simpledialog
-from tkinter.ttk import *
 import turtle
 import time
 import pyttsx3
@@ -10,6 +10,7 @@ import playsound
 import hashlib
 import subprocess
 
+#Defines the Window
 
 window = Tk()
 window.title('iNex')
@@ -18,7 +19,7 @@ window.geometry('400x400')
 # Start #
 ############################################################
 
-#Tasks
+#list of tasks assigned to a variable which expicitly contains the data type
 t1: str = '1. Run a calculator'
 t2: str = '2. Tell a joke'
 t3: str = '3. Open you Diary'
@@ -30,7 +31,7 @@ t8: str = '8. Tables Upto 20'
 t9: str = '9. About'
 
 
-#Speech
+#Speech module initialisation
 nex = pyttsx3.init()
 
 #Dice
@@ -60,11 +61,17 @@ def Calc():
 def jokes():
     nex.say("Need Some Comedy?  No problem. I'm here")
     nex.runAndWait()
-    time.sleep(0.3)
+    time.sleep(0.1)
     rn = random.randint(1,2)
-    
-    def laugh():
+
+
+    def joke(jokeQ,jokeA):
+        nex.say(jokeQ)
+        nex.runAndWait()
+        time.sleep(0.1)
+        nex.say(jokeA)
         nex.say('HA HA HA HA')
+        nex.runAndWait()
     
     jokeQ1 = 'Why Do You Call The Train A Bubble Gum?'
     jokeA1 = ' Because CHEW CHEW TRAIN !!!'
@@ -73,20 +80,9 @@ def jokes():
     jokeA2 = 'You would call it a  Milkshake !!!'
     
     if (rn == 1):
-        nex.say(jokeQ1)
-        nex.runAndWait()
-        time.sleep(0.2)
-        nex.say(jokeA1)
-        laugh()
-        nex.runAndWait()
-        
+        joke(jokeQ1,jokeA1)
     elif (rn == 2):
-        nex.say(jokeQ2)
-        nex.runAndWait()
-        time.sleep(0.2)
-        nex.say(jokeA2)
-        laugh()
-        nex.runAndWait()
+        joke(jokeQ2,jokeA2)
         
 #Diary
 def diary():
@@ -199,31 +195,58 @@ def happy_birthday():
 
     
 #Tables
-def tables():
-    nex.say('Need To Learn Tables')
-    nex.say('I am Here To Help You')
-    nex.runAndWait()
-    
-    n = 20
-    a = 1
-    b = 10
-    
-    for i in range(2, n+1):
-        for j in range(a, b+1):
-            result = i * j
-            nex.say(str(i))
-            nex.say('times')
-            nex.say(j)
-            nex.say('equals')
-            nex.say(result)
+# Initialize text-to-speech engine
+
+
+def multiply_questions():
+    windows = Tk()
+    while True:
+        num1 = random.randint(1, 20)
+        num2 = random.randint(1, 20)
+        if (num1 >= 11 and num2 >= 11) or (num1 < 11 and num2 < 11):
+            continue
+        question = f"What is {num1} x {num2}?"
+        answer = num1 * num2
+        nex.say(question)
+        nex.runAndWait()
+        user_answer = input(f"Answer to {question}: ")
+        if user_answer.lower() == "exit":
+            break
+        elif int(user_answer) == answer:
+            nex.say("Correct!")
             nex.runAndWait()
+        else:
+            nex.say(f"Incorrect. The correct answer is {answer}.")
+            nex.runAndWait()
+
+
+def create_window():
+    windows = Tk()
+    windows.title("Multiplication Quiz")
+    windows.geometry("300x200")
+    # Create label and buttons
+    label = ttk.Label(windows, text="Select an option:")
+    label.pack(pady=10)
+    
+    quiz_button = ttk.Button(windows, text="Take Quiz", command=multiply_questions)
+    quiz_button.pack(pady=5)
+
+    exit_button = ttk.Button(windows, text="Stop Questions", command=multiply_questions("Exit"))
+    exit_button.pack(pady=3)
+
+def tables():
+    nex.say('Need To Learn Multiplication Tables, huh?')
+    nex.say('I am Here To Help You')
+    nex.say('I will ask you random questions, try to answer them')
+    nex.runAndWait()
+    create_window()
 
 
 #About
 
 def about():
 
-    message = "I am a Python AI voice assistant. I can do a variety of things, including telling jokes, opening programs, and even singing you a birthday song! \nAnswer this question and I will tell you the hint of your PASSWORD \n ***FIRST YEAR AFTER CHIRST'S BIRTH?***"
+    message = "I am a Python assistant. I can do a variety of things, including telling jokes, opening programs, and even singing you a birthday song! \nAnswer this question and I will tell you the hint of your PASSWORD \n ***10 raised to 0 (or) 10^0?***"
     messagebox.showinfo("About", message)
     
     choice = simpledialog.askstring(title="What to do ",prompt="What Should I do")
@@ -232,7 +255,7 @@ def about():
         nex.say('Welcome to password recovery')
         nex.say('To Remember your password I will give You A hint')
         nex.runAndWait()
-        messagebox.showinfo('Hint','HINT:   KEYOARD LAYOUT ')
+        messagebox.showinfo('Hint','HINT:   DEFAULT KEYOARD LAYOUT ')
     
 # End #
 ############################################################
@@ -253,23 +276,23 @@ greeting2.pack()
 
 
 #Tasks
-task1 = Button(text = t1, command = Calc)
+task1 = ttk.Button(text = t1, command = Calc)
 
-task2 = Button(text = t2, command = jokes)
+task2 = ttk.Button(text = t2, command = jokes)
 
-task3 = Button(text = t3, command = diary)
+task3 = ttk.Button(text = t3, command = diary)
 
-task4 = Button(text = t4, command = clipboard)
+task4 = ttk.Button(text = t4, command = clipboard)
 
-task5 = Button(text = t5, command = music)
+task5 = ttk.Button(text = t5, command = music)
 
-task6 = Button(text = t6, command = happy_birthday)
+task6 = ttk.Button(text = t6, command = happy_birthday)
 
-task7 = Button(text = t7, command = dice)
+task7 = ttk.Button(text = t7, command = dice)
 
-task8 = Button(text = t8, command = tables)
+task8 = ttk.Button(text = t8, command = tables)
 
-task9 = Button(text = t9, command = about)
+task9 = ttk.Button(text = t9, command = about)
 
 task1.pack()
 task2.pack()
