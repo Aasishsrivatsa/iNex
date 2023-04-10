@@ -26,9 +26,8 @@ t4: str = '4. Open ClipBoard'
 t5: str = '5. Play Rock Song'
 t6: str = '6. Birthday Special'
 t7: str = '7. Roll a dice'
-t8: str = '8. Helicopter Game'
-t9: str = '9. Tables Upto 20'
-t10: str = '10. About'
+t8: str = '8. Tables Upto 20'
+t9: str = '9. About'
 
 
 #Speech
@@ -126,7 +125,7 @@ def clipboard():
 def music():
     nex.say('Party Time')
     nex.runAndWait()
-    playsound('E:\Music\HM.mp3')
+    playsound('Music.mp3')
     
 #Happy_Birthday
 
@@ -248,11 +247,9 @@ greeting.pack()
 
 
 
-greeting2 = Label(text = 'I can :')
+greeting2 = Label(text = 'I can :\n\n')
 greeting2.pack()
 
-greeting3 = Label(text = '     ')
-greeting3.pack()
 
 
 #Tasks
@@ -270,9 +267,9 @@ task6 = Button(text = t6, command = happy_birthday)
 
 task7 = Button(text = t7, command = dice)
 
-task9 = Button(text = t9, command = tables)
+task8 = Button(text = t8, command = tables)
 
-task10 = Button(text = t10, command = about)
+task9 = Button(text = t9, command = about)
 
 task1.pack()
 task2.pack()
@@ -281,8 +278,8 @@ task4.pack()
 task5.pack()
 task6.pack()
 task7.pack()
+task8.pack()
 task9.pack()
-task10.pack()
 
 #Tasks
 
