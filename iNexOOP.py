@@ -141,7 +141,7 @@ class MultiplicationQuiz:
 
     def multiply_questions(self):
         #brain of the quiz
-        
+
         while True:
 
             lst = list(range(1, 11))
@@ -172,11 +172,10 @@ class MultiplicationQuiz:
         self.Mulwindow.mainloop()
 
 
+if __name__ == "__main__":
+    Nex = Voice()
 
+    iNex = Core()
 
-Nex = Voice()
-
-iNex = Core()
-
-Nex.say("hi, Welcome.")
-iNex.window.mainloop()
+    Nex.say("hi, Welcome.")
+    iNex.window.mainloop()

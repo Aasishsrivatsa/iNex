@@ -1,12 +1,10 @@
 import os
 import random
-from tkinter import messagebox, simpledialog, Label, ttk
-from tkinter import *
+from tkinter import messagebox, simpledialog, Label, ttk, Tk
 import turtle
 import time
 import pyttsx3
 import playsound
-import hashlib
 import subprocess
 
 #Defines the Window
@@ -49,7 +47,7 @@ def dice():
 #CALC
 def Calc():
     try:
-        subprocess.run(['python', 'D:\Python projects while bored\CALC.py'], check=True)
+        subprocess.run(['python', 'CALC.py'], check=True)
     except FileNotFoundError:
         print('CALC.py not found')
     except subprocess.CalledProcessError as e:
@@ -86,13 +84,12 @@ def jokes():
 #Diary
 def diary():
     # Prompt for password
-    password = b'QWERTY'  # Use a bytes object for the password
-    hashed_password = hashlib.sha256(password).hexdigest()
+    password = 'QWERTY'
     verify = simpledialog.askstring(title="Verification", prompt="What's the Password?")
 
     try:
         # Verify password
-        if hashed_password == hashlib.sha256(verify.encode()).hexdigest():
+        if verify == password:
             print('ACCESS GRANTED')
 
             # Open diary file
@@ -120,7 +117,7 @@ def clipboard():
 def music():
     nex.say('Party Time')
     nex.runAndWait()
-    playsound('Music.mp3')
+    playsound.playsound('Music.mp3')
     
 #Happy_Birthday
 
@@ -134,16 +131,19 @@ def happy_birthday():
     nex.runAndWait()
 
     age = simpledialog.askinteger(title="Question", prompt="What's Your Current Age?")
-    d2 = f"So {name} is {age} years old."
-    d3 = f"Let's clap {age} times for {name}!"
-    nex.say(d2)
-    nex.say(d3)
-    nex.runAndWait()
-    time.sleep(age)
+    if age is not None:
+        d2 = f"So {name} is {age} years old."
+        d3 = f"Let's clap {age} times for {name}!"
+        nex.say(d2)
+        nex.say(d3)
+        nex.runAndWait()
+        time.sleep(age)
+    elif age is None:
+        nex.say("You didn't enter your age. So it's secrets time")
 
     nex.say('Okay So Lets Cut The Birthday Cake')
     nex.runAndWait()
-    draw_cake(name)
+    
 
     def draw_cake(name):
         turtle.speed(3)
@@ -192,7 +192,8 @@ def happy_birthday():
             turtle.forward(20)
             turtle.right(90)
 
-    
+    draw_cake(name)
+
 #Tables
 def multiply_questions():
     while True:
@@ -236,7 +237,7 @@ def create_window():
     quiz_button = ttk.Button(windows, text="Take Quiz", command=multiply_questions)
     quiz_button.pack(pady=5)
 
-    exit_button = ttk.Button(windows, text="Stop Questions", command=multiply_questions("Exit"))
+    exit_button = ttk.Button(windows, text="Stop Questions", command=multiply_questions)
     exit_button.pack(pady=3)
 
 def tables():
