@@ -140,6 +140,8 @@ class MultiplicationQuiz:
         exit_button.pack(pady=3)
 
     def multiply_questions(self):
+        #brain of the quiz
+        
         while True:
 
             lst = list(range(1, 11))
@@ -153,18 +155,17 @@ class MultiplicationQuiz:
 
             Nex.say_sync(question)
 
-            try:
-                user_input = simpledialog.askstring("Answer", question)
-                user_input = int(user_input)
-                if int(user_input) == answer:
-                    Nex.say_sync("Correct!")
-                else:
-                    Nex.say_sync(f"Incorrect. The correct answer is {answer}.")
-            except ValueError or TypeError:
-                if user_input is None or type(user_input) != int:
-                    Nex.say_sync("exiting..")
-                    break
-            time.sleep(0.075)
+            user_input = simpledialog.askstring("Answer", question)
+
+            if user_input == str(answer):
+                Nex.say_sync("Correct!")
+            elif user_input is None or user_input == "EXIT" or user_input == "":
+                Nex.say_sync("Exiting...")
+                self.Mulwindow.destroy()
+                break
+            else:
+                Nex.say_sync(f"Incorrect. The correct answer is {answer}.")
+
 
     def run(self):
         Nex.say('Need To Learn Multiplication Tables, huh?')
