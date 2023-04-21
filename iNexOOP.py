@@ -3,7 +3,6 @@
 import os
 import random
 from tkinter import messagebox, simpledialog, Label, ttk, Tk
-import turtle
 import time
 import pyttsx3
 import playsound
@@ -12,16 +11,22 @@ import threading
 
 class Voice:
     def __init__(self):
-        self.nex = pyttsx3.init()
+        self.Nex = pyttsx3.init()
         self.lock = threading.Lock()
 
     def say(self, text):
         def _threaded_say(text):
             with self.lock:
-                self.nex.say(text)
-                self.nex.runAndWait()
+                self.Nex.say(text)
+                self.Nex.runAndWait()
 
         threading.Thread(target=_threaded_say, args=(text,)).start()
+
+    def say_sync(self, text):
+        self.Nex.say(text)
+        self.Nex.runAndWait()
+
+
 
 
 class Core:
@@ -39,12 +44,9 @@ class Core:
         self.window = Tk()
         self.window.title("iNex")
         self.window.geometry("400x300")
-
-    def greet(self):
+        self.window.resizable(False, False)
         greeting = Label(text="Welcome to iNex\nI can :\n\n")
         greeting.pack()
-
-    def make_widgets(self):
         for task_num,task in enumerate(self._tasks, start=1):
             button = ttk.Button(text=self._tasks[task_num], command=self.selector(task_num))
             button.pack()
@@ -63,8 +65,13 @@ class Core:
 
 class Things:
     def open_calculator(self):
+        Nex.say('Opening Calculator')
+        root_dir = os.getcwd()
+        
+        calc_path = os.path.join(root_dir,'CALC.py')
+        print(calc_path)
         try:
-            subprocess.run(['python', 'D:\Python projects while bored\CALC.py'], check=True)
+            subprocess.run(['python', calc_path], check=True)
         except FileNotFoundError:
             print('CALC.py not found')
         except subprocess.CalledProcessError as e:
@@ -89,13 +96,22 @@ class Things:
 
 
     def open_clipboard(self):
-        pass
+        Nex.say('Opening Clipboard')
+        subprocess.run(['notepad.exe', 'ClipBoard.txt'])
 
     def play_music(self):
-        pass
+        playsound.playsound('Music.mp3')
 
     def roll_dice(self):
-        pass
+        Nex.say('Rolling Dice')
+        Nex.say('Play Time!')
+        
+        result = random.randint(1, 6)
+        message = f"The result is {result}"
+        
+        Nex.say(message)
+        
+        messagebox.showinfo("Result", message)
 
     def multiplication_quiz(self):
         quiz = MultiplicationQuiz()
@@ -125,6 +141,7 @@ class MultiplicationQuiz:
 
     def multiply_questions(self):
         while True:
+
             lst = list(range(1, 11))
             lst.extend(range(11, 21))
 
@@ -134,23 +151,23 @@ class MultiplicationQuiz:
             question = f"What is {num1} x {num2}?"
             answer = num1 * num2
 
-            Nex.say(question)
+            Nex.say_sync(question)
 
-            user_input = simpledialog.askstring("Answer", question)
+            try:
+                user_input = simpledialog.askstring("Answer", question)
+                user_input = int(user_input)
+                if int(user_input) == answer:
+                    Nex.say_sync("Correct!")
+                else:
+                    Nex.say_sync(f"Incorrect. The correct answer is {answer}.")
+            except ValueError or TypeError:
+                if user_input is None or type(user_input) != int:
+                    Nex.say_sync("exiting..")
+                    break
+            time.sleep(0.075)
 
-            if user_input is None or user_input.lower() == "exit":
-                Nex.say("exiting..")
-                break
-
-            elif int(user_input) == answer:
-                Nex.say("Correct!")
-            else:
-                Nex.say(f"Incorrect. The correct answer is {answer}.")
-        time.sleep(0.075)
     def run(self):
         Nex.say('Need To Learn Multiplication Tables, huh?')
-        Nex.say('I am Here To Help You')
-        Nex.say('I will ask you random questions, try to answer them')
         self.Mulwindow.mainloop()
 
 
@@ -159,8 +176,6 @@ class MultiplicationQuiz:
 Nex = Voice()
 
 iNex = Core()
-iNex.greet()
-iNex.make_widgets()
-Nex.say("hi, Welcome.")
 
+Nex.say("hi, Welcome.")
 iNex.window.mainloop()
