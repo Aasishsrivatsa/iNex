@@ -3,18 +3,20 @@
 import os
 import random
 from tkinter import messagebox, simpledialog, Label, ttk, Tk
-import time
 import pyttsx3
 import playsound
 import subprocess
 import threading
 
 class Voice:
+    #Related to Voice
     def __init__(self):
         self.Nex = pyttsx3.init()
+        self.Nex.setProperty("rate",230)
         self.lock = threading.Lock()
 
     def say(self, text):
+        # making say() a threaded function;improves responsiveness of I/O tasks, like GUI
         def _threaded_say(text):
             with self.lock:
                 self.Nex.say(text)
@@ -23,6 +25,8 @@ class Voice:
         threading.Thread(target=_threaded_say, args=(text,)).start()
 
     def say_sync(self, text):
+        #exclusively made for MultiplicationGame Class
+        #sync process for reliability at cases
         self.Nex.say(text)
         self.Nex.runAndWait()
 
@@ -30,6 +34,8 @@ class Voice:
 
 
 class Core:
+    #Heart of the program
+    #Dictionary to choose task, instead of if,elif,else
     _tasks = {
         1: "Run A Calculator",
         2: "Open your Diary",
@@ -41,17 +47,22 @@ class Core:
     }
 
     def __init__(self):
+        #initialisation of the GUI and startup tasks
         self.window = Tk()
         self.window.title("iNex")
         self.window.geometry("400x300")
         self.window.resizable(False, False)
+
         greeting = Label(text="Welcome to iNex\nI can :\n\n")
         greeting.pack()
+
+        #makes buttons
         for task_num,task in enumerate(self._tasks, start=1):
-            button = ttk.Button(text=self._tasks[task_num], command=self.selector(task_num))
+            button = ttk.Button(text=self._tasks[task_num], command=self._selector(task_num))
             button.pack()
 
-    def selector(self, tsk_num):
+    def _selector(self, tsk_num):
+        #selects what the button does
         _task_fns = {
             1 : TasksThingy.open_calculator,
             2 : TasksThingy.open_diary,
@@ -61,24 +72,27 @@ class Core:
             6 : TasksThingy.multiplication_quiz,
             7 : TasksThingy.about
         }
-        return _task_fns[tsk_num]
+        return lambda: _task_fns[tsk_num]()
+
 
 class Things:
+    #Specialised Tasks
+
     def open_calculator(self):
+        #opens Calculator
         Nex.say('Opening Calculator')
-        root_dir = os.getcwd()
         
-        calc_path = os.path.join(root_dir,'CALC.py')
-        print(calc_path)
-        try:
-            subprocess.run(['python', calc_path], check=True)
-        except FileNotFoundError:
-            print('CALC.py not found')
-        except subprocess.CalledProcessError as e:
-            print(f'Error running CALC.py: {e}')
+        if os.path.exists("CALC.py"):
+            try:
+                subprocess.call(["python", "CALC.py"])
+            except OSError as e:
+                print("Error: ", e)
+        else:
+            Nex.say("The CALC.py file does not exist in the current directory.")
 
 
     def open_diary(self):
+        #makes and opens diary, doesnt make if exists
         word = 'QWERTY'
         verify = simpledialog.askstring(title="Verification", prompt="What's the Password?")
         try:
@@ -96,13 +110,16 @@ class Things:
 
 
     def open_clipboard(self):
+        #name explains
         Nex.say('Opening Clipboard')
         subprocess.run(['notepad.exe', 'ClipBoard.txt'])
 
     def play_music(self):
+        #name explains
         playsound.playsound('Music.mp3')
 
     def roll_dice(self):
+        #name explains
         Nex.say('Rolling Dice')
         Nex.say('Play Time!')
         
@@ -114,21 +131,26 @@ class Things:
         messagebox.showinfo("Result", message)
 
     def multiplication_quiz(self):
+        #soo big that it has its own class, this method just initialises and runs it
         quiz = MultiplicationQuiz()
         quiz.run()
 
     def about(self):
         pass
-    
+
+#useful for calling, nothing to be initialised
 TasksThingy = Things()
 
 
 class MultiplicationQuiz:
-    
+    #for game exculsively
     def __init__(self):
+        #makes window,GUI and says msg upon initialisation
         self.Mulwindow = Tk()
         self.Mulwindow.title("Multiplication Quiz")
         self.Mulwindow.geometry("200x200")
+
+        Nex.say('Need To Learn Multiplication, huh?')
 
         label = ttk.Label(self.Mulwindow, text="Select an option:\nType EXIT in the Answer Box to EXIT")
         label.pack(pady=10)
@@ -138,17 +160,19 @@ class MultiplicationQuiz:
 
         exit_button = ttk.Button(self.Mulwindow, text="Quit", command=self.Mulwindow.destroy)
         exit_button.pack(pady=3)
+        
+        self.Mulwindow.mainloop()
 
     def multiply_questions(self):
-        #brain of the quiz
+        #quiz master
 
         while True:
 
-            lst = list(range(1, 11))
-            lst.extend(range(11, 21))
+            #lst = list(range(1, 11)) #makes sure that the questions have a higher probability of being though
+            #lst.extend(range(11, 21))
 
-            num1 = random.choice(lst)
-            num2 = random.choice(lst)
+            num1 = random.choice(range(1,11))
+            num2 = random.choice(range(1,20))
 
             question = f"What is {num1} x {num2}?"
             answer = num1 * num2
@@ -157,6 +181,7 @@ class MultiplicationQuiz:
 
             user_input = simpledialog.askstring("Answer", question)
 
+            #taking decision, whether correct, wrong or quit
             if user_input == str(answer):
                 Nex.say_sync("Correct!")
             elif user_input is None or user_input == "EXIT" or user_input == "":
@@ -168,10 +193,9 @@ class MultiplicationQuiz:
 
 
     def run(self):
-        Nex.say('Need To Learn Multiplication Tables, huh?')
-        self.Mulwindow.mainloop()
+        pass
 
-
+#making sure everything wont start automatically when imported as a module
 if __name__ == "__main__":
     Nex = Voice()
 
