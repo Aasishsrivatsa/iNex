@@ -1,17 +1,14 @@
 #OOP version of iNex
-
 import os
-import random
 from tkinter import messagebox, simpledialog, Label, ttk, Tk
-import pyttsx3
 from playsound import playsound
-import subprocess
 import threading
 
 class Voice:
+    import pyttsx3
     #Related to Voice
     def __init__(self):
-        self.Nex = pyttsx3.init()
+        self.Nex = self.pyttsx3.init()
         self.Nex.setProperty("rate",225)
         self.lock = threading.Lock()
 
@@ -45,13 +42,15 @@ class _Core:
         6: "Multiplication Quiz",
         7: "About"
     }
-
     def __init__(self):
         #initialisation of the GUI and startup tasks
+
+        
+        Nex.say("hi, Welcome.")
+
         self.window = Tk()
         self.window.title("iNex")
         self.window.geometry("400x300")
-        self.window.resizable(False, False)
 
         greeting = Label(text="Welcome to iNex\nI can :\n\n")
         greeting.pack()
@@ -76,6 +75,8 @@ class _Core:
 
 
 class CallTasks:
+    import subprocess
+    import random
     #Specialised Tasks
 
     def open_calculator(self):
@@ -84,7 +85,7 @@ class CallTasks:
         
         if os.path.exists("CALC.py"):
             try:
-                subprocess.call(["python", "CALC.py"])
+                self.subprocess.call(["python", "CALC.py"])
             except OSError as e:
                 print("Error: ", e)
         else:
@@ -101,7 +102,7 @@ class CallTasks:
             if verify == word:
                 Nex.say('ACCESS GRANTED')
 
-                subprocess.run(['notepad.exe', 'Diary.txt'])
+                self.subprocess.run(['notepad.exe', 'Diary.txt'])
             else:
                 print('ACCESS DENIED \nRetry!')
                 Nex.say('ACCESS DENIED')
@@ -114,7 +115,7 @@ class CallTasks:
     def open_clipboard(self):
         #name explains
         Nex.say('Opening Clipboard')
-        subprocess.run(['notepad.exe', 'ClipBoard.txt'])
+        self.subprocess.run(['notepad.exe', 'ClipBoard.txt'])
 
     def play_music(self):
         #name explains
@@ -124,7 +125,7 @@ class CallTasks:
         #name explains
         Nex.say_sync('Rolling Dice')
         
-        result = random.randint(1, 6)
+        result = self.random.randint(1, 6)
         message = f"The result is {result}"
         
         Nex.say(message)
@@ -143,6 +144,7 @@ TasksThingy = CallTasks()
 
 
 class MultiplicationQuiz:
+    import random
     #for game exculsively
     def __init__(self):
         #makes window,GUI and says msg upon initialisation
@@ -162,15 +164,15 @@ class MultiplicationQuiz:
         exit_button.pack(pady=3)
         
         self.Mulwindow.mainloop()
-
+    
     def multiply_questions(self):
         #quiz master
 
         while True:
             #makes sure that the questions have a higher probability of being though
             
-            num1 = random.choice(range(1,11))
-            num2 = random.choice(range(1,20))
+            num1 = self.random.choice(range(1,11))
+            num2 = self.random.choice(range(1,20))
 
             question = f"What is {num1} x {num2}?"
             answer = num1 * num2
@@ -190,14 +192,10 @@ class MultiplicationQuiz:
                 Nex.say_sync(f"Incorrect. The correct answer is {answer}.")
 
 
-    def run(self):
-        pass
-
 #making sure everything wont start automatically when imported as a module
 if __name__ == "__main__":
     Nex = Voice()
 
     iNex = _Core()
 
-    Nex.say("hi, Welcome.")
     iNex.window.mainloop()
