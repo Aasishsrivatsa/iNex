@@ -4,7 +4,7 @@ import os
 import random
 from tkinter import messagebox, simpledialog, Label, ttk, Tk
 import pyttsx3
-import playsound
+from playsound import playsound
 import subprocess
 import threading
 
@@ -12,11 +12,11 @@ class Voice:
     #Related to Voice
     def __init__(self):
         self.Nex = pyttsx3.init()
-        self.Nex.setProperty("rate",230)
+        self.Nex.setProperty("rate",225)
         self.lock = threading.Lock()
 
     def say(self, text):
-        # making say() a threaded function;improves responsiveness of I/O tasks, like GUI
+        #Making say() a threaded function; improves responsiveness of I/O tasks, like GUI
         def _threaded_say(text):
             with self.lock:
                 self.Nex.say(text)
@@ -25,15 +25,15 @@ class Voice:
         threading.Thread(target=_threaded_say, args=(text,)).start()
 
     def say_sync(self, text):
-        #exclusively made for MultiplicationGame Class
-        #sync process for reliability at cases
+        #Made for synchronisation of the say() function
+        #Sync process for reliability at cases
         self.Nex.say(text)
         self.Nex.runAndWait()
 
 
 
 
-class Core:
+class _Core:
     #Heart of the program
     #Dictionary to choose task, instead of if,elif,else
     _tasks = {
@@ -72,10 +72,10 @@ class Core:
             6 : TasksThingy.multiplication_quiz,
             7 : TasksThingy.about
         }
-        return lambda: _task_fns[tsk_num]()
+        return _task_fns[tsk_num]
 
 
-class Things:
+class CallTasks:
     #Specialised Tasks
 
     def open_calculator(self):
@@ -94,10 +94,12 @@ class Things:
     def open_diary(self):
         #makes and opens diary, doesnt make if exists
         word = 'QWERTY'
+        Nex.say("What's the Password?")
         verify = simpledialog.askstring(title="Verification", prompt="What's the Password?")
+        
         try:
             if verify == word:
-                print('ACCESS GRANTED')
+                Nex.say('ACCESS GRANTED')
 
                 subprocess.run(['notepad.exe', 'Diary.txt'])
             else:
@@ -116,12 +118,11 @@ class Things:
 
     def play_music(self):
         #name explains
-        playsound.playsound('Music.mp3')
+        playsound('Music.mp3')
 
     def roll_dice(self):
         #name explains
-        Nex.say('Rolling Dice')
-        Nex.say('Play Time!')
+        Nex.say_sync('Rolling Dice')
         
         result = random.randint(1, 6)
         message = f"The result is {result}"
@@ -133,13 +134,12 @@ class Things:
     def multiplication_quiz(self):
         #soo big that it has its own class, this method just initialises and runs it
         quiz = MultiplicationQuiz()
-        quiz.run()
 
     def about(self):
         pass
 
 #useful for calling, nothing to be initialised
-TasksThingy = Things()
+TasksThingy = CallTasks()
 
 
 class MultiplicationQuiz:
@@ -167,10 +167,8 @@ class MultiplicationQuiz:
         #quiz master
 
         while True:
-
-            #lst = list(range(1, 11)) #makes sure that the questions have a higher probability of being though
-            #lst.extend(range(11, 21))
-
+            #makes sure that the questions have a higher probability of being though
+            
             num1 = random.choice(range(1,11))
             num2 = random.choice(range(1,20))
 
@@ -199,7 +197,7 @@ class MultiplicationQuiz:
 if __name__ == "__main__":
     Nex = Voice()
 
-    iNex = Core()
+    iNex = _Core()
 
     Nex.say("hi, Welcome.")
     iNex.window.mainloop()
