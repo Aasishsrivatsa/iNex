@@ -77,6 +77,7 @@ class _Core:
 class CallTasks:
     import subprocess
     import random
+    import time
     #Specialised Tasks
 
     def open_calculator(self):
@@ -101,11 +102,12 @@ class CallTasks:
         try:
             if verify == word:
                 Nex.say('ACCESS GRANTED')
+                print('ACCESS GRANTED at', self.time.ctime())
 
                 self.subprocess.run(['notepad.exe', 'Diary.txt'])
             else:
                 print('ACCESS DENIED \nRetry!')
-                Nex.say('ACCESS DENIED')
+                Nex.say('ACCESS DENIED at', self.time.ctime())
                 Nex.say('Retry')
 
         except:
