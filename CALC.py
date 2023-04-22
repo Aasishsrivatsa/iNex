@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import Frame,YES,BOTH,Button,LEFT,Entry,StringVar,TOP,RIDGE
  
 def iCalc(source, side):
     storeObj = Frame(source, borderwidth=4, bd=4, bg="powder blue")

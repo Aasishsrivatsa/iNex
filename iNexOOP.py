@@ -1,20 +1,19 @@
 #OOP version of iNex
-
 import os
-import random
 from tkinter import messagebox, simpledialog, Label, ttk, Tk
-import time
-import pyttsx3
-import playsound
-import subprocess
+from playsound import playsound
 import threading
 
 class Voice:
+    import pyttsx3
+    #Related to Voice
     def __init__(self):
-        self.Nex = pyttsx3.init()
+        self.Nex = self.pyttsx3.init()
+        self.Nex.setProperty("rate",225)
         self.lock = threading.Lock()
 
     def say(self, text):
+        #Making say() a threaded function; improves responsiveness of I/O tasks, like GUI
         def _threaded_say(text):
             with self.lock:
                 self.Nex.say(text)
@@ -23,13 +22,17 @@ class Voice:
         threading.Thread(target=_threaded_say, args=(text,)).start()
 
     def say_sync(self, text):
+        #Made for synchronisation of the say() function
+        #Sync process for reliability at cases
         self.Nex.say(text)
         self.Nex.runAndWait()
 
 
 
 
-class Core:
+class _Core:
+    #Heart of the program
+    #Dictionary to choose task, instead of if,elif,else
     _tasks = {
         1: "Run A Calculator",
         2: "Open your Diary",
@@ -39,19 +42,26 @@ class Core:
         6: "Multiplication Quiz",
         7: "About"
     }
-
     def __init__(self):
+        #initialisation of the GUI and startup tasks
+
+        
+        Nex.say("hi, Welcome.")
+
         self.window = Tk()
         self.window.title("iNex")
         self.window.geometry("400x300")
-        self.window.resizable(False, False)
+
         greeting = Label(text="Welcome to iNex\nI can :\n\n")
         greeting.pack()
+
+        #makes buttons
         for task_num,task in enumerate(self._tasks, start=1):
-            button = ttk.Button(text=self._tasks[task_num], command=self.selector(task_num))
+            button = ttk.Button(text=self._tasks[task_num], command=self._selector(task_num))
             button.pack()
 
-    def selector(self, tsk_num):
+    def _selector(self, tsk_num):
+        #selects what the button does
         _task_fns = {
             1 : TasksThingy.open_calculator,
             2 : TasksThingy.open_diary,
@@ -63,32 +73,41 @@ class Core:
         }
         return _task_fns[tsk_num]
 
-class Things:
+
+class CallTasks:
+    import subprocess
+    import random
+    import time
+    #Specialised Tasks
+
     def open_calculator(self):
+        #opens Calculator
         Nex.say('Opening Calculator')
-        root_dir = os.getcwd()
         
-        calc_path = os.path.join(root_dir,'CALC.py')
-        print(calc_path)
-        try:
-            subprocess.run(['python', calc_path], check=True)
-        except FileNotFoundError:
-            print('CALC.py not found')
-        except subprocess.CalledProcessError as e:
-            print(f'Error running CALC.py: {e}')
+        if os.path.exists("CALC.py"):
+            try:
+                self.subprocess.call(["python", "CALC.py"])
+            except OSError as e:
+                print("Error: ", e)
+        else:
+            Nex.say("The CALC.py file does not exist in the current directory.")
 
 
     def open_diary(self):
+        #makes and opens diary, doesnt make if exists
         word = 'QWERTY'
+        Nex.say("What's the Password?")
         verify = simpledialog.askstring(title="Verification", prompt="What's the Password?")
+        
         try:
             if verify == word:
-                print('ACCESS GRANTED')
+                Nex.say('ACCESS GRANTED')
+                print('ACCESS GRANTED at', self.time.ctime())
 
-                subprocess.run(['notepad.exe', 'Diary.txt'])
+                self.subprocess.run(['notepad.exe', 'Diary.txt'])
             else:
                 print('ACCESS DENIED \nRetry!')
-                Nex.say('ACCESS DENIED')
+                Nex.say('ACCESS DENIED at', self.time.ctime())
                 Nex.say('Retry')
 
         except:
@@ -96,17 +115,19 @@ class Things:
 
 
     def open_clipboard(self):
+        #name explains
         Nex.say('Opening Clipboard')
-        subprocess.run(['notepad.exe', 'ClipBoard.txt'])
+        self.subprocess.run(['notepad.exe', 'ClipBoard.txt'])
 
     def play_music(self):
-        playsound.playsound('Music.mp3')
+        #name explains
+        playsound('Music.mp3')
 
     def roll_dice(self):
-        Nex.say('Rolling Dice')
-        Nex.say('Play Time!')
+        #name explains
+        Nex.say_sync('Rolling Dice')
         
-        result = random.randint(1, 6)
+        result = self.random.randint(1, 6)
         message = f"The result is {result}"
         
         Nex.say(message)
@@ -114,21 +135,26 @@ class Things:
         messagebox.showinfo("Result", message)
 
     def multiplication_quiz(self):
+        #soo big that it has its own class, this method just initialises and runs it
         quiz = MultiplicationQuiz()
-        quiz.run()
 
     def about(self):
         pass
-    
-TasksThingy = Things()
+
+#useful for calling, nothing to be initialised
+TasksThingy = CallTasks()
 
 
 class MultiplicationQuiz:
-    
+    import random
+    #for game exculsively
     def __init__(self):
+        #makes window,GUI and says msg upon initialisation
         self.Mulwindow = Tk()
         self.Mulwindow.title("Multiplication Quiz")
         self.Mulwindow.geometry("200x200")
+
+        Nex.say('Need To Learn Multiplication, huh?')
 
         label = ttk.Label(self.Mulwindow, text="Select an option:\nType EXIT in the Answer Box to EXIT")
         label.pack(pady=10)
@@ -138,44 +164,40 @@ class MultiplicationQuiz:
 
         exit_button = ttk.Button(self.Mulwindow, text="Quit", command=self.Mulwindow.destroy)
         exit_button.pack(pady=3)
-
+        
+        self.Mulwindow.mainloop()
+    
     def multiply_questions(self):
+        #quiz master
+
         while True:
-
-            lst = list(range(1, 11))
-            lst.extend(range(11, 21))
-
-            num1 = random.choice(lst)
-            num2 = random.choice(lst)
+            #makes sure that the questions have a higher probability of being though
+            
+            num1 = self.random.choice(range(1,11))
+            num2 = self.random.choice(range(1,20))
 
             question = f"What is {num1} x {num2}?"
             answer = num1 * num2
 
             Nex.say_sync(question)
 
-            try:
-                user_input = simpledialog.askstring("Answer", question)
-                user_input = int(user_input)
-                if int(user_input) == answer:
-                    Nex.say_sync("Correct!")
-                else:
-                    Nex.say_sync(f"Incorrect. The correct answer is {answer}.")
-            except ValueError or TypeError:
-                if user_input is None or type(user_input) != int:
-                    Nex.say_sync("exiting..")
-                    break
-            time.sleep(0.075)
+            user_input = simpledialog.askstring("Answer", question)
 
-    def run(self):
-        Nex.say('Need To Learn Multiplication Tables, huh?')
-        self.Mulwindow.mainloop()
+            #taking decision, whether correct, wrong or quit
+            if user_input == str(answer):
+                Nex.say_sync("Correct!")
+            elif user_input is None or user_input == "EXIT" or user_input == "":
+                Nex.say_sync("Exiting...")
+                self.Mulwindow.destroy()
+                break
+            else:
+                Nex.say_sync(f"Incorrect. The correct answer is {answer}.")
 
 
+#making sure everything wont start automatically when imported as a module
+if __name__ == "__main__":
+    Nex = Voice()
 
+    iNex = _Core()
 
-Nex = Voice()
-
-iNex = Core()
-
-Nex.say("hi, Welcome.")
-iNex.window.mainloop()
+    iNex.window.mainloop()
